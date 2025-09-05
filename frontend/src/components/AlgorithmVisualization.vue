@@ -104,6 +104,11 @@
           </div>
         </div>
         
+        <!-- 冒泡排序可视化 -->
+        <div v-else-if="currentAlgorithm?.name === 'bubble_sort'" class="bubble-sort-viz">
+          <SortVisualization />
+        </div>
+        
         <!-- 通用可视化 (为其他算法准备) -->
         <div v-else class="generic-visualization">
           <div class="data-snapshot">
@@ -121,6 +126,7 @@ import { computed } from 'vue'
 import { storeToRefs } from 'pinia'
 // 不再使用图标导入
 import { useAlgorithmStore } from '@/stores/algorithm'
+import SortVisualization from './SortVisualization.vue'
 
 const algorithmStore = useAlgorithmStore()
 const { currentResult, currentStepData, currentAlgorithm, currentStep, totalSteps } = storeToRefs(algorithmStore)
@@ -452,6 +458,12 @@ const getActionType = (action: string) => {
 
 .current-action {
   font-size: 16px;
+}
+
+/* 冒泡排序可视化样式 */
+.bubble-sort-viz {
+  width: 100%;
+  height: 100%;
 }
 
 /* 通用可视化样式 */

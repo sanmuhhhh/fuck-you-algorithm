@@ -15,34 +15,32 @@
     </div>
 
     <div v-else class="workspace-content">
-      <!-- 算法信息头部 -->
+      <!-- 算法信息头部 - 紧凑版 -->
       <div class="algorithm-header">
         <div class="algorithm-title">
           <h2>{{ currentAlgorithm.display_name }}</h2>
           <el-tag type="primary">{{ currentAlgorithm.category }}</el-tag>
         </div>
-        <p class="algorithm-desc">{{ currentAlgorithm.description }}</p>
-        <div v-if="currentAlgorithm.complexity_time" class="complexity-info">
-          <span>时间复杂度: {{ currentAlgorithm.complexity_time }}</span>
-          <span v-if="currentAlgorithm.complexity_space" class="ml-4">
-            空间复杂度: {{ currentAlgorithm.complexity_space }}
-          </span>
+        <div class="algorithm-meta">
+          <span class="algorithm-desc">{{ currentAlgorithm.description }}</span>
+          <div v-if="currentAlgorithm.complexity_time" class="complexity-info">
+            <span>{{ currentAlgorithm.complexity_time }}</span>
+            <span v-if="currentAlgorithm.complexity_space">{{ currentAlgorithm.complexity_space }}</span>
+          </div>
         </div>
       </div>
 
-      <!-- 控制面板 -->
-      <div class="control-panel">
-        <AlgorithmControl />
-      </div>
+      <!-- 主工作区 - 网格布局 -->
+      <div class="main-workspace">
+        <!-- 左侧：控制面板 -->
+        <div class="control-panel">
+          <AlgorithmControl />
+        </div>
 
-      <!-- 可视化区域 -->
-      <div class="visualization-area">
-        <AlgorithmVisualization />
-      </div>
-
-      <!-- 步骤信息 -->
-      <div class="step-info">
-        <StepInfo />
+        <!-- 右侧：可视化区域 -->
+        <div class="visualization-area">
+          <AlgorithmVisualization />
+        </div>
       </div>
     </div>
   </div>
@@ -87,7 +85,7 @@ const refreshAlgorithms = () => {
   height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   animation: fadeInUp 0.6s ease-out;
 }
 
@@ -104,13 +102,14 @@ const refreshAlgorithms = () => {
 
 .algorithm-header {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
-  padding: 24px;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  padding: 16px 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
   position: relative;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .algorithm-header::before {
@@ -127,7 +126,14 @@ const refreshAlgorithms = () => {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 8px;
+}
+
+.algorithm-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
 }
 
 .algorithm-title h2 {
@@ -140,57 +146,65 @@ const refreshAlgorithms = () => {
 
 .algorithm-desc {
   color: #666;
-  margin: 0 0 16px 0;
-  line-height: 1.6;
-  font-size: 16px;
-  text-align: justify;
+  margin: 0;
+  line-height: 1.5;
+  font-size: 14px;
+  flex: 1;
 }
 
 .complexity-info {
   display: flex;
-  gap: 20px;
-  font-size: 14px;
+  gap: 12px;
+  font-size: 12px;
   color: #909399;
   font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
   background: rgba(0, 0, 0, 0.05);
-  padding: 12px 16px;
-  border-radius: 8px;
-  border-left: 4px solid #409eff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border-left: 3px solid #409eff;
+  white-space: nowrap;
+}
+
+/* 主工作区网格布局 */
+.main-workspace {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  grid-template-rows: 1fr;
+  gap: 16px;
+  min-height: 0;
 }
 
 .control-panel {
+  grid-column: 1;
+  grid-row: 1;
   background: rgba(255, 255, 255, 0.95);
-  padding: 20px;
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
+  overflow-y: auto;
 }
 
 .visualization-area {
-  flex: 1;
+  grid-column: 2;
+  grid-row: 1;
   background: rgba(255, 255, 255, 0.95);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
-  min-height: 450px;
   overflow: hidden;
   transition: all 0.3s ease;
+  min-height: 400px;
 }
 
 .visualization-area:hover {
   box-shadow: 0 12px 48px rgba(0, 0, 0, 0.15);
 }
 
-.step-info {
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  overflow: hidden;
-}
+/* .step-info 样式已移除，执行信息已整合到控制面板 */
 
 .ml-4 {
   margin-left: 16px;
@@ -223,35 +237,61 @@ const refreshAlgorithms = () => {
 }
 
 /* 响应式设计 */
+@media (max-width: 1024px) {
+  .main-workspace {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr;
+    gap: 12px;
+  }
+  
+  .control-panel {
+    grid-column: 1;
+    grid-row: 1;
+    max-height: none;
+  }
+  
+  .visualization-area {
+    grid-column: 1;
+    grid-row: 2;
+    min-height: 400px;
+  }
+}
+
 @media (max-width: 768px) {
   .workspace-content {
-    gap: 16px;
+    gap: 12px;
   }
   
   .algorithm-header {
-    padding: 20px;
+    padding: 12px 16px;
+  }
+  
+  .algorithm-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
   
   .algorithm-title h2 {
-    font-size: 20px;
+    font-size: 18px;
   }
   
   .algorithm-desc {
-    font-size: 14px;
+    font-size: 13px;
   }
   
   .complexity-info {
     flex-direction: column;
-    gap: 8px;
-    font-size: 12px;
+    gap: 6px;
+    font-size: 11px;
   }
   
   .control-panel {
-    padding: 16px;
+    padding: 12px;
   }
   
   .visualization-area {
-    min-height: 350px;
+    min-height: 300px;
   }
 }
 

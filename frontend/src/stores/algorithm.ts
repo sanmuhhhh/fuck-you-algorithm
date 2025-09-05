@@ -90,7 +90,7 @@ export const useAlgorithmStore = defineStore('algorithm', () => {
         isPlaying.value = false
         clearInterval(timer)
       }
-    }, 1000) // 每秒一步
+    }, 200) // 每200毫秒一步，更快的播放速度
   }
 
   const pause = () => {
