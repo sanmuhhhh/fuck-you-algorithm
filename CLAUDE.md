@@ -8,30 +8,48 @@
 
 ## 开发命令
 
+### 一键启动服务
 ```bash
-# 创建virtual environment
-python -m venv venv
+# 全平台启动 (交互式选择)
+python start.py
+
+# 仅启动后端
+cd backend && python start.py
+
+# 仅启动前端  
+cd frontend && python start.py
+```
+
+### 开发环境
+```bash
+# 后端测试
+python test_api.py
+
+# 前端依赖管理 (自动处理)
+cd frontend && python start.py
+
+# 手动前端操作 (如需要)
+cd frontend
+npm install
+npm run dev
+npm run build
+```
+
+### 代码质量 (后端)
+```bash
+# 在虚拟环境中运行
+cd backend
 source venv/bin/activate  # Windows: venv\Scripts\activate
 
-# 安装dependencies
-pip install -r requirements.txt
-pip install -r requirements-dev.txt
-
-# 运行tests
-pytest
-pytest tests/test_specific_file.py
-pytest -v
-pytest -k "test_function_name"
-
-# Code formatting和linting
+# 代码检查
 black .
 flake8 .
 isort .
 mypy .
 
-# 运行scripts
-python main.py
-python -m module_name
+# 测试
+pytest
+pytest tests/test_specific_file.py -v
 ```
 
 ## 项目结构
