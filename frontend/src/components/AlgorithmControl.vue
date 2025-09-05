@@ -31,12 +31,11 @@
           type="primary" 
           @click="executeAlgorithm"
           :loading="loading"
-          :icon="Play"
         >
-          执行算法
+          ▶️ 执行算法
         </el-button>
-        <el-button @click="resetConfig" :icon="Refresh">
-          重置参数
+        <el-button @click="resetConfig">
+          🔄 重置参数
         </el-button>
       </div>
     </div>
@@ -47,32 +46,28 @@
         <el-button-group>
           <el-button 
             @click="reset" 
-            :icon="RefreshLeft"
             :disabled="totalSteps === 0"
           >
-            重置
+            🔄 重置
           </el-button>
           <el-button 
             @click="prevStep" 
-            :icon="ArrowLeft"
             :disabled="!hasPrevStep"
           >
-            上一步
+            ⬅️ 上一步
           </el-button>
           <el-button 
             @click="isPlaying ? pause() : play()" 
-            :icon="isPlaying ? VideoPause : VideoPlay"
             type="primary"
             :disabled="totalSteps === 0"
           >
-            {{ isPlaying ? '暂停' : '播放' }}
+            {{ isPlaying ? '⏸️ 暂停' : '▶️ 播放' }}
           </el-button>
           <el-button 
             @click="nextStep" 
-            :icon="ArrowRight"
             :disabled="!hasNextStep"
           >
-            下一步
+            ➡️ 下一步
           </el-button>
         </el-button-group>
       </div>
@@ -98,15 +93,7 @@
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
 import { storeToRefs } from 'pinia'
-import { 
-  Play, 
-  Refresh, 
-  RefreshLeft, 
-  ArrowLeft, 
-  ArrowRight,
-  VideoPlay,
-  VideoPause
-} from '@element-plus/icons-vue'
+// 不再使用图标导入
 import { useAlgorithmStore } from '@/stores/algorithm'
 
 const algorithmStore = useAlgorithmStore()
