@@ -12,6 +12,8 @@ export const useAlgorithmStore = defineStore('algorithm', () => {
   const isPlaying = ref(false)
   const loading = ref(false)
   const error = ref<string | null>(null)
+  const playbackSpeed = ref(300)  // 播放速度（毫秒）
+  const playTimer = ref<NodeJS.Timeout | null>(null)
 
   // 计算属性
   const steps = computed(() => currentResult.value?.steps || [])
@@ -80,26 +82,43 @@ export const useAlgorithmStore = defineStore('algorithm', () => {
       currentStep.value = stepIndex
     }
   }
+  
+  const setPlaybackSpeed = (speed: number) => {
+    playbackSpeed.value = speed
+  }
 
   const play = () => {
+    if (isPlaying.value) return
+    
     isPlaying.value = true
-    const timer = setInterval(() => {
-      if (hasNextStep.value) {
+    
+    const playStep = () => {
+      if (hasNextStep.value && isPlaying.value) {
         nextStep()
+        playTimer.value = setTimeout(playStep, playbackSpeed.value)
       } else {
         isPlaying.value = false
-        clearInterval(timer)
+        if (playTimer.value) {
+          clearTimeout(playTimer.value)
+          playTimer.value = null
+        }
       }
-    }, 200) // 每200毫秒一步，更快的播放速度
+    }
+    
+    playStep()
   }
 
   const pause = () => {
     isPlaying.value = false
+    if (playTimer.value) {
+      clearTimeout(playTimer.value)
+      playTimer.value = null
+    }
   }
 
   const reset = () => {
+    pause()
     currentStep.value = 0
-    isPlaying.value = false
   }
 
   const clearError = () => {
@@ -115,6 +134,7 @@ export const useAlgorithmStore = defineStore('algorithm', () => {
     isPlaying,
     loading,
     error,
+    playbackSpeed,
     
     // 计算属性
     steps,
@@ -133,6 +153,7 @@ export const useAlgorithmStore = defineStore('algorithm', () => {
     play,
     pause,
     reset,
+    setPlaybackSpeed,
     clearError,
   }
 })

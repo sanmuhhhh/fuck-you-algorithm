@@ -64,6 +64,45 @@
         </el-form>
       </div>
       
+      <!-- 石头分配配置 -->
+      <div v-else-if="currentAlgorithm?.name === 'stone_distribution'" class="config-form">
+        <el-form :model="stoneConfigForm" label-width="80px" size="small">
+          <el-form-item label="格子数量">
+            <el-input-number 
+              v-model="stoneConfigForm.k_boxes" 
+              :min="3" 
+              :max="20" 
+            />
+          </el-form-item>
+          <el-form-item label="石头总数">
+            <el-input-number 
+              v-model="stoneConfigForm.n_stones" 
+              :min="3" 
+              :max="300" 
+            />
+          </el-form-item>
+          <el-form-item label="等分数量">
+            <el-input-number 
+              v-model="stoneConfigForm.p_parts" 
+              :min="2" 
+              :max="10" 
+            />
+          </el-form-item>
+        </el-form>
+        
+        <!-- 问题预览 -->
+        <div class="problem-preview">
+          <h5>📋 问题预览</h5>
+          <div class="preview-text">
+            <p>{{ stoneConfigForm.k_boxes }}个格子，格子0有{{ stoneConfigForm.n_stones }}个石头</p>
+            <p>目标：前{{ stoneConfigForm.p_parts }}个格子各有{{ Math.floor(stoneConfigForm.n_stones / stoneConfigForm.p_parts) }}个石头</p>
+            <p v-if="stoneConfigForm.n_stones % stoneConfigForm.p_parts !== 0" class="error-msg">
+              ⚠️ {{ stoneConfigForm.n_stones }}无法被{{ stoneConfigForm.p_parts }}整除
+            </p>
+          </div>
+        </div>
+      </div>
+      
       <div class="action-buttons">
         <el-button 
           type="primary" 
@@ -125,8 +164,25 @@
         </div>
       </div>
       
+      <!-- 播放速度控制 -->
+      <div class="speed-control">
+        <div class="speed-label">播放速度</div>
+        <el-slider
+          v-model="playbackSpeed"
+          :min="50"
+          :max="2000"
+          :step="50"
+          @change="updatePlaybackSpeed"
+          show-input
+          input-size="small"
+        />
+        <div class="speed-info">
+          {{ Math.round(1000 / playbackSpeed) }} 步/秒
+        </div>
+      </div>
+      
       <!-- 执行信息 -->
-      <div class="execution-info">
+      <div class="execution-info" v-if="currentAlgorithm?.name !== 'stone_distribution'">
         <h5>📊 执行统计</h5>
         <div class="stats-grid">
           <div class="stat-item">
@@ -153,6 +209,21 @@
           </template>
         </div>
       </div>
+      
+      <!-- 石头分配算法的简化信息 -->
+      <div class="execution-info" v-else-if="currentAlgorithm?.name === 'stone_distribution' && currentResult">
+        <h5>📊 执行信息</h5>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <span class="stat-label">总步骤:</span>
+            <span class="stat-value">{{ totalSteps }}</span>
+          </div>
+          <div class="stat-item" v-if="currentStepData?.data_snapshot?.states_explored">
+            <span class="stat-label">已搜索状态:</span>
+            <span class="stat-value">{{ currentStepData.data_snapshot.states_explored }}</span>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -173,7 +244,8 @@ const {
   hasPrevStep,
   isPlaying,
   loading,
-  currentAlgorithm
+  currentAlgorithm,
+  playbackSpeed
 } = storeToRefs(algorithmStore)
 
 const { 
@@ -183,7 +255,8 @@ const {
   goToStep,
   play,
   pause,
-  reset
+  reset,
+  setPlaybackSpeed
 } = algorithmStore
 
 // Hello World 配置表单
@@ -201,9 +274,16 @@ const sortConfigForm = reactive({
   show_swaps: true
 })
 
-// 数组输入和长度控制
+// 冒泡排序 - 数组输入和长度控制
 const arrayInput = ref('89, 34, 67, 23, 78, 45, 12, 56, 91, 38, 72, 15, 84, 29, 63')
 const arrayLength = ref(15)
+
+// 石头分配配置表单
+const stoneConfigForm = reactive({
+  k_boxes: 4,
+  n_stones: 12,
+  p_parts: 3
+})
 
 // 从输入更新数组
 const updateArrayFromInput = () => {
@@ -250,6 +330,15 @@ const executeAlgorithm = async () => {
         show_swaps: sortConfigForm.show_swaps
       }
     )
+  } else if (currentAlgorithm.value?.name === 'stone_distribution') {
+    await storeExecuteAlgorithm(
+      {},
+      {
+        k_boxes: stoneConfigForm.k_boxes,
+        n_stones: stoneConfigForm.n_stones,
+        p_parts: stoneConfigForm.p_parts
+      }
+    )
   }
 }
 
@@ -266,7 +355,16 @@ const resetConfig = () => {
     sortConfigForm.show_swaps = true
     arrayInput.value = '64, 34, 25, 12, 22, 11, 90'
     arrayLength.value = 7
+  } else if (currentAlgorithm.value?.name === 'stone_distribution') {
+    stoneConfigForm.k_boxes = 4
+    stoneConfigForm.n_stones = 12
+    stoneConfigForm.p_parts = 3
   }
+}
+
+// 更新播放速度
+const updatePlaybackSpeed = (speed: number) => {
+  setPlaybackSpeed(speed)
 }
 </script>
 
@@ -353,6 +451,59 @@ const resetConfig = () => {
 .stat-value {
   font-size: 12px;
   color: #409eff;
+  font-weight: 600;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+}
+
+/* 石头分配问题预览样式 */
+.problem-preview {
+  margin-top: 16px;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+
+.problem-preview h5 {
+  margin: 0 0 8px 0;
+  color: #333;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.preview-text p {
+  margin: 4px 0;
+  font-size: 12px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.error-msg {
+  color: #f56c6c !important;
+  font-weight: 600;
+}
+
+/* 速度控制样式 */
+.speed-control {
+  margin-top: 16px;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+}
+
+.speed-label {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+.speed-info {
+  text-align: center;
+  color: #409eff;
+  font-size: 11px;
+  margin-top: 6px;
   font-weight: 600;
   font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
 }

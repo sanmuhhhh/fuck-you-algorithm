@@ -12,7 +12,7 @@
       </el-header>
 
       <!-- 主体内容 -->
-      <el-container>
+      <el-container class="main-container">
         <!-- 侧边栏 - 算法列表 -->
         <el-aside width="300px" class="sidebar">
           <AlgorithmList />
@@ -45,6 +45,8 @@ onMounted(() => {
 .app-container {
   height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  display: flex;
+  flex-direction: column;
 }
 
 .app-header {
@@ -91,6 +93,11 @@ onMounted(() => {
   letter-spacing: 0.5px;
 }
 
+.main-container {
+  flex: 1;
+  min-height: 0;
+}
+
 .sidebar {
   background: rgba(255, 255, 255, 0.95);
   border-right: 1px solid rgba(0, 0, 0, 0.1);
@@ -103,7 +110,9 @@ onMounted(() => {
   background: rgba(255, 255, 255, 0.9);
   padding: 24px;
   backdrop-filter: blur(10px);
-  overflow-y: auto;
+  overflow: hidden;
+  flex: 1;
+  min-height: 0;
 }
 
 /* 响应式设计 */
